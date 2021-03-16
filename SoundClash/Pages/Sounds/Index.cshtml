@@ -1,0 +1,114 @@
+﻿@page
+@model SoundClash.Pages.Sounds.IndexModel
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+@section Styles{
+    <link rel="stylesheet" href="~/css/soundIndex.css" />
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-page="Create">Create New</a>
+</p>
+
+<form>
+    <p>
+        <select class="IndexFilter" asp-for="SoundType" asp-items="Html.GetEnumSelectList<SoundType>()">
+        </select>
+        <input class="IndexFilter" type="text" placeholder="Filter" asp-for="SearchString"/>
+    </p>
+</form>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+
+            </th>
+            <th>
+                <a asp-route-sortOrder=@Model.Name
+                   asp-route-soundType=@Model.SoundType
+                   asp-route-searchString=@Model.SearchString
+                   asp-route-pageIndex=@Model.SoundIndex.PageIndex>
+                    @Html.DisplayNameFor(model => model.SoundIndex[0].Name)
+                </a>
+            </th>
+            <th>
+                <a asp-route-sortOrder=@Model.Uploader
+                   asp-route-soundType=@Model.SoundType
+                   asp-route-searchString=@Model.SearchString
+                   asp-route-pageIndex=@Model.SoundIndex.PageIndex>
+                    @Html.DisplayNameFor(model => model.SoundIndex[0].Uploader)
+                </a>
+            </th>
+            <th>
+                <a asp-route-sortOrder=@Model.Type
+                   asp-route-soundType=@Model.SoundType
+                   asp-route-searchString=@Model.SearchString
+                   asp-route-pageIndex=@Model.SoundIndex.PageIndex>
+                    @Html.DisplayNameFor(model => model.SoundIndex[0].Type)
+                </a>
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (SoundIndex sound in Model.SoundIndex)
+        {
+            <tr>
+                <td>
+                    <partial name="_AudioPartial" model="sound.FileLocation" />
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => sound.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => sound.Uploader)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => sound.Type)
+                </td>
+                <td>
+                    <a asp-page="./Details" asp-route-id="@sound.Id">Details</a>
+
+                    @if ((await AuthorizationService.AuthorizeAsync(
+                                                   User, sound.Id,
+                                                   UserOperations.Update)).Succeeded)
+                    {
+                        <text> | </text>
+                        <a asp-page="./Edit" asp-route-id="@sound.Id">Edit</a>
+                    }
+
+                    @if ((await AuthorizationService.AuthorizeAsync(
+                                                   User, sound.Id,
+                                                   UserOperations.Delete)).Succeeded)
+                    {
+                        <text> | </text>
+                        <a asp-page="./Delete" asp-route-id="@sound.Id">Delete</a>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a asp-route-pageIndex=@(Model.SoundIndex.PageIndex - 1)
+   asp-route-sortOrder=@Model.CurrentSort
+   asp-route-soundType=@Model.SoundType
+   asp-route-searchString=@Model.SearchString
+   class="btn btn-primary @(Model.SoundIndex.HasPreviousPage ? "" : "disabled")">
+    Previous
+</a>
+
+<a asp-route-pageIndex=@(Model.SoundIndex.PageIndex + 1)
+   asp-route-sortOrder=@Model.CurrentSort
+   asp-route-soundType=@Model.SoundType
+   asp-route-searchString=@Model.SearchString
+   class="btn btn-primary @(Model.SoundIndex.HasNextPage ? "" : "disabled")">
+    Next
+</a>

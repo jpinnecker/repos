@@ -1,0 +1,18 @@
+﻿@page "/SoundDeck"
+
+
+<EditForm Model="clashIndex">
+    @foreach (SoundElement element in clashIndex.Elements)
+    {
+        <ClashElement soundElement="@element"></ClashElement>
+    }
+</EditForm>
+
+<button @onclick="Add" class="btn btn-primary">+</button>
+
+
+@code {
+    private ClashIndex clashIndex = new ClashIndex();
+    
+    void Add() => clashIndex.Elements.Add(new SoundElement());
+}

@@ -1,0 +1,57 @@
+﻿@using Microsoft.AspNetCore.SignalR.Client
+@inject NavigationManager NavigationManager
+@inject ApplicationDbContext DbContext
+
+<EditForm Model="soundElement">
+    <div>
+        <InputSelect @bind-Value="soundElement.Sound.Type">
+            @foreach (SoundType type in Enum.GetValues(typeof(SoundType)))
+            {
+                <option>@type</option>
+            }
+        </InputSelect>
+        <input @bind-value="@soundElement.Sound.Name" @oninput="SoundSearch" />
+        <InputSelect @bind-Value="soundSelect">
+            @foreach (SoundSelect choice in soundElement.searchList)
+            {
+                <option>@choice.SoundName</option>
+            }
+        </InputSelect>
+        <audio controls>
+            <source src="@soundSelect?.FileLocation" type="audio/mpeg">
+            Your browser does not support the audio element.
+        </audio>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public SoundElement soundElement { get; set; }
+
+    private SoundSelect soundSelect;
+
+    private HubConnection hubConnection;
+
+    protected override async Task OnInitializedAsync()
+    {
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/clashhub"))
+            .Build();
+
+
+        hubConnection.On<List<SoundSelect>>("ReceiveSoundList", soundList =>
+        {
+            soundElement.searchList = soundList;
+            StateHasChanged();
+        });
+
+        await hubConnection.StartAsync();
+    }
+
+    Task SoundSearch() => hubConnection.SendAsync("SoundSearch", soundElement.Sound.Name);
+
+    private async Task<string> SoundSelect(string newSoundName)
+    {
+        return await DbContext.Sound.Where(s => s.Name == newSoundName).Select(s => s.FileLocation).SingleAsync();
+    }
+}

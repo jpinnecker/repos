@@ -1,0 +1,56 @@
+﻿@page "{id:int}"
+@model SoundClash.Pages.Sounds.EditModel
+
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Pages/Shared/_Layout.cshtml";
+}
+
+<h1>Edit</h1>
+
+<h4>Sound</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form enctype="multipart/form-data" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="SoundEdit.Name" class="control-label"></label>
+                <input asp-for="SoundEdit.Name" class="form-control" />
+                <span asp-validation-for="SoundEdit.Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SoundEdit.Type" class="control-label"></label>
+                <select asp-for="SoundEdit.Type" asp-items="@(Html.GetEnumSelectList<SoundType>())" class="form-control"></select>
+                <span asp-validation-for="SoundEdit.Type" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="SoundEdit.FormFile" class="control-label"></label>
+                <input asp-for="SoundEdit.FormFile" type="file" class="form-control" />
+                <span asp-validation-for="SoundEdit.FormFile" class="text-danger"></span>
+            </div>
+            <partial name="_AudioPartial" model="Model.SoundEdit.FileLocation"/>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+<div>
+    <a asp-page="./Details" asp-route-id="@Model.Id">Details</a> |
+    @if ((await AuthorizationService.AuthorizeAsync(
+                                    User, Model.Id,
+                                    UserOperations.Delete)).Succeeded)
+    {
+        <a asp-page="./Delete" asp-route-id="@Model.Id">Delete</a>
+        <text> | </text>
+    }
+    <a asp-page="./Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="~/js/SoundTypeValidationScript.js"></script>
+    <script src="~/js/FileSizeValidationScript.js"></script>
+    <script src="~/js/FileExtensionValidationScript.js"></script>
+}

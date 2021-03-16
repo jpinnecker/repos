@@ -1,0 +1,31 @@
+﻿@page
+@model SoundClash.Pages.Clash.IndexModel
+@{
+    ViewData["Title"] = "Clash!";
+}
+
+@*<form asp-page-handler="add" method="post">
+    <input type="hidden" asp-for="ClashIndex"/>
+    <button class="btn btn-primary">+</button>
+</form>
+
+<ul id="ClashElementList">
+    @foreach (ClashElement element in Model.ClashIndex.Elements)
+    {
+        <li>
+            <partial name="_ClashElementPartial" model="element"/>
+        </li>
+    }
+</ul>*@
+
+<component type="typeof(SoundDeck)" render-mode="Server" />
+
+<div style="height: 100px">
+
+</div>
+
+<component type="typeof(Chat)" render-mode="ServerPrerendered" />
+
+@section Scripts {
+    <script src="_framework/blazor.server.js"></script>
+}
